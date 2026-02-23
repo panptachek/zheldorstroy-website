@@ -1,10 +1,11 @@
-import { pressCategories } from '../../content/siteContent';
+import { pressCategories, pressIntro } from '../../content/siteContent';
 
 export function PressSection() {
   return (
     <section id="press" className="section">
       <div className="container">
         <h2>Пресс-центр</h2>
+        <p className="muted">{pressIntro}</p>
         <div className="chips">
           {pressCategories.map((c) => <span key={c} className="chip">{c}</span>)}
         </div>

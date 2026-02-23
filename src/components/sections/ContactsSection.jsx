@@ -1,10 +1,11 @@
-import { contacts } from '../../content/siteContent';
+import { contacts, contactsIntro } from '../../content/siteContent';
 
 export function ContactsSection() {
   return (
     <section id="contacts" className="section">
       <div className="container">
         <h2>Контакты</h2>
+        <p className="muted">{contactsIntro}</p>
         <div className="grid-2">
           <article className="card">
             <h3>{contacts.legalName}</h3>

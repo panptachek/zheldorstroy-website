@@ -1,5 +1,5 @@
 import { Button } from '../ui/Button';
-import { metrics } from '../../content/siteContent';
+import { heroTitle, heroSubtitle, metrics } from '../../content/siteContent';
 
 export function HeroSection() {
   return (
@@ -7,8 +7,8 @@ export function HeroSection() {
       <div className="container hero__layout">
         <div>
           <p className="eyebrow">Industrial Luxury / Engineering Power</p>
-          <h1>Строим железнодорожную инфраструктуру федерального масштаба</h1>
-          <p className="muted">Высокоскоростные коридоры, критические узлы и энергетическая устойчивость — полный цикл от проектирования до ввода в эксплуатацию.</p>
+          <h1>{heroTitle}</h1>
+          <p className="muted">{heroSubtitle}</p>
           <div className="hero__actions">
             <Button>Обсудить проект</Button>
             <Button variant="ghost">Смотреть кейсы</Button>
