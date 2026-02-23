@@ -1,7 +1,12 @@
+import { useState } from 'react';
 import { Button } from '../ui/Button';
 import { heroTitle, heroSubtitle, metrics } from '../../content/siteContent';
 
+const heroVariants = ['/assets/hero-v3-1.png', '/assets/hero-v3-2.png', '/assets/hero-v3-3.png'];
+
 export function HeroSection() {
+  const [active, setActive] = useState(0);
+
   return (
     <section id="home" className="section hero">
       <div className="container hero__layout">
@@ -14,8 +19,17 @@ export function HeroSection() {
             <Button variant="ghost">Смотреть кейсы</Button>
           </div>
         </div>
-        <div className="hero__media" role="img" aria-label="Высокоскоростной поезд в фирменных цветах">
-          <span>Hero visual placeholder (Recraft v3)</span>
+        <div>
+          <div className="hero__media" role="img" aria-label="Высокоскоростной поезд в фирменных цветах">
+            <img src={heroVariants[active]} alt="Высокоскоростной поезд ООО ЖЕЛДОРСТРОЙ" loading="eager" />
+          </div>
+          <div className="hero__switch">
+            {heroVariants.map((_, idx) => (
+              <button key={idx} type="button" className={`hero-dot ${active === idx ? 'is-active' : ''}`} onClick={() => setActive(idx)} aria-label={`Показать hero-вариант ${idx + 1}`}>
+                {idx + 1}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
       <div className="container hero__metrics">
