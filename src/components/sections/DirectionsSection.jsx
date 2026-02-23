@@ -9,9 +9,9 @@ export function DirectionsSection() {
           <img src="/assets/directions-icons-sheet.svg" alt="Набор векторных иконок направлений ЖЕЛДОРСТРОЙ" style={{ width: '100%', maxWidth: 520, display: 'block' }} />
         </div>
         <div className="grid-4">
-          {directions.map((item) => (
+          {directions.map((item, idx) => (
             <article className="card" key={item.title}>
-              <div className="icon-placeholder">{item.title.split(' ')[0]}</div>
+              <div className="icon-placeholder" aria-hidden="true">{idx + 1}</div>
               <h3>{item.title}</h3>
               <p className="muted">{item.text}</p>
             </article>
