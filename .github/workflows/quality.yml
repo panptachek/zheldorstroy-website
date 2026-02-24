@@ -20,4 +20,23 @@ jobs:
       - run: sudo apt-get update && sudo apt-get install -y xvfb
       - run: npx playwright install --with-deps chromium
       - run: npm run test:e2e
-      - run: xvfb-run -a npm run lhci
+      - name: Lighthouse (retry on NO_FCP)
+        run: |
+          npm run build
+          npm run preview -- --host 127.0.0.1 --port 4173 >/tmp/preview.log 2>&1 &
+          sleep 2
+          for i in 1 2 3; do
+            echo "Lighthouse attempt $i"
+            if xvfb-run -a npx lighthouse http://127.0.0.1:4173 \
+              --chrome-flags='--headless=new --no-sandbox --disable-gpu --disable-dev-shm-usage --disable-software-rasterizer' \
+              --only-categories=performance,accessibility,best-practices,seo \
+              --output=json --output-path=./lighthouse-report.json; then
+              break
+            fi
+            if [ "$i" -eq 3 ]; then
+              echo "Lighthouse failed after 3 attempts"
+              exit 1
+            fi
+            sleep 3
+          done
+          node ./scripts/lighthouse-threshold-check.mjs ./lighthouse-report.json
