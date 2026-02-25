@@ -10,22 +10,25 @@ on:
 jobs:
   baseline:
     runs-on: ubuntu-22.04
-    container:
-      image: mcr.microsoft.com/playwright:v1.58.2-jammy
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
       - run: npm ci
+      - name: Install Playwright Chromium (pinned by lockfile)
+        run: npx playwright install --with-deps chromium
+      - name: Setup Chrome Stable
+        uses: browser-actions/setup-chrome@v1
+      - name: Export CHROME_PATH
+        run: |
+          echo "CHROME_PATH=$(which google-chrome)" >> "$GITHUB_ENV"
+          echo "Resolved CHROME_PATH=$(which google-chrome)"
       - name: Playwright smoke (blocking)
         run: npx playwright test tests/e2e/smoke.spec.js
-      - name: Playwright visual baseline (advisory)
-        continue-on-error: true
-        run: |
-          npx playwright test tests/e2e/baseline.spec.js tests/e2e/sections.spec.js
-      - name: Resolve CHROME_PATH for Lighthouse
-        run: |
-          CHROME_BIN="$(node -e 'const p=require("playwright");process.stdout.write(p.chromium.executablePath())')"
-          echo "CHROME_PATH=$CHROME_BIN" >> "$GITHUB_ENV"
-          echo "Resolved CHROME_PATH=$CHROME_BIN"
+      - name: Playwright visual baseline (blocking)
+        run: npm run test:e2e:visual
       - name: Lighthouse (retry on NO_FCP)
         run: |
           npm run build

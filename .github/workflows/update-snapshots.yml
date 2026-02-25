@@ -1,0 +1,26 @@
+name: Update Playwright Snapshots (Linux)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  update-snapshots:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Install Playwright Chromium (pinned by lockfile)
+        run: npx playwright install --with-deps chromium
+      - name: Update Linux snapshots
+        run: npm run test:e2e:update
+      - name: Upload updated snapshots artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-linux-snapshots
+          path: |
+            tests/e2e/baseline.spec.js-snapshots
+            tests/e2e/sections.spec.js-snapshots
