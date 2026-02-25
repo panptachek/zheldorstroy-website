@@ -41,8 +41,6 @@ const sectionIds = ['home', 'about', 'directions', 'projects', 'jobs', 'press', 
 
 for (const sectionId of sectionIds) {
   test(`section snapshot: ${sectionId}`, async ({ page }) => {
-    test.skip(!!process.env.CI && !process.env.BROWSERSTACK_USERNAME, 'section visual baselines run on BrowserStack');
-
     await waitForStableVisual(page);
     const section = page.locator(`section#${sectionId}`);
     await expect(section).toBeVisible();

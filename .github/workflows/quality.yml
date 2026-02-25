@@ -10,15 +10,11 @@ on:
 jobs:
   baseline:
     runs-on: ubuntu-22.04
+    container:
+      image: mcr.microsoft.com/playwright:v1.58.2-jammy
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
       - run: npm ci
-      - run: sudo apt-get update && sudo apt-get install -y xvfb
-      - run: npx playwright install --with-deps chromium
       - run: npm run test:e2e
       - name: Lighthouse (retry on NO_FCP)
         run: |
@@ -27,7 +23,7 @@ jobs:
           sleep 2
           for i in 1 2 3; do
             echo "Lighthouse attempt $i"
-            if xvfb-run -a npx lighthouse http://127.0.0.1:4173 \
+            if npx lighthouse http://127.0.0.1:4173 \
               --chrome-flags='--headless=new --no-sandbox --disable-gpu --disable-dev-shm-usage --disable-software-rasterizer' \
               --only-categories=performance,accessibility,best-practices,seo \
               --output=json --output-path=./lighthouse-report.json; then

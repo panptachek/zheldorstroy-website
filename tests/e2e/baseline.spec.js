@@ -40,8 +40,6 @@ async function waitForStableVisual(page) {
 }
 
 test('homepage visual baseline', async ({ page }) => {
-  test.skip(!!process.env.CI && !process.env.BROWSERSTACK_USERNAME, 'fullPage snapshot disabled on generic CI; run visual baselines on BrowserStack');
-
   await waitForStableVisual(page);
 
   await expect(page).toHaveScreenshot('homepage.png', {
