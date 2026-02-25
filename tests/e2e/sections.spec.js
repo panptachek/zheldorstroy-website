@@ -3,7 +3,6 @@ import { test, expect } from '@playwright/test';
 async function waitForStableVisual(page) {
   await page.goto('/', { waitUntil: 'domcontentloaded' });
 
-  // Disable animations ASAP (before network settles)
   await page.addStyleTag({
     content: `
       *, *::before, *::after {
@@ -11,20 +10,14 @@ async function waitForStableVisual(page) {
         transition: none !important;
         caret-color: transparent !important;
       }
+      .section {
+        content-visibility: visible !important;
+        contain-intrinsic-size: auto !important;
+      }
     `
   });
 
   await page.waitForLoadState('networkidle');
-
-  // Full-page warmup to stabilize lazy/content-visibility rendering
-  await page.evaluate(async () => {
-    const step = 800;
-    for (let y = 0; y < document.body.scrollHeight; y += step) {
-      window.scrollTo(0, y);
-      await new Promise((r) => setTimeout(r, 40));
-    }
-    window.scrollTo(0, 0);
-  });
 
   await page.evaluate(async () => {
     if (document.fonts?.ready) await document.fonts.ready;
@@ -46,14 +39,17 @@ async function waitForStableVisual(page) {
   await page.waitForTimeout(50);
 }
 
-test('homepage visual baseline', async ({ page }) => {
-  await waitForStableVisual(page);
+const sectionIds = ['home', 'about', 'directions', 'projects', 'jobs', 'press', 'contacts'];
 
-  await expect(page).toHaveScreenshot('homepage.png', {
-    fullPage: true,
-    animations: 'disabled',
-    maxDiffPixelRatio: 0.02,
-    maxDiffPixels: 8000,
-    timeout: 20_000
+for (const sectionId of sectionIds) {
+  test(`section snapshot: ${sectionId}`, async ({ page }) => {
+    await waitForStableVisual(page);
+    const section = page.locator(`section#${sectionId}`);
+    await expect(section).toBeVisible();
+    await expect(section).toHaveScreenshot(`${sectionId}.png`, {
+      animations: 'disabled',
+      maxDiffPixelRatio: process.env.CI ? 0.02 : 0.01,
+      timeout: 20_000
+    });
   });
-});
+}

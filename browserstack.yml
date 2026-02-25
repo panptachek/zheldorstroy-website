@@ -1,0 +1,18 @@
+userName: ${BROWSERSTACK_USERNAME}
+accessKey: ${BROWSERSTACK_ACCESS_KEY}
+framework: playwright
+platforms:
+  - os: OS X
+    osVersion: Sonoma
+    browserName: chrome
+    browserVersion: latest
+  - deviceName: Samsung Galaxy S23
+    osVersion: 13.0
+    browserName: chrome
+browserstackLocal: true
+buildName: zheldorstroy-${GITHUB_RUN_NUMBER}
+projectName: zheldorstroy-website
+debug: true
+networkLogs: true
+consoleLogs: info
+testObservability: true

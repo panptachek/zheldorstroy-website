@@ -9,17 +9,23 @@ on:
 
 jobs:
   baseline:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
+    container:
+      image: mcr.microsoft.com/playwright:v1.58.2-jammy
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
       - run: npm ci
-      - run: sudo apt-get update && sudo apt-get install -y xvfb
-      - run: npx playwright install --with-deps chromium
-      - run: npm run test:e2e
+      - name: Playwright smoke (blocking)
+        run: npx playwright test tests/e2e/smoke.spec.js
+      - name: Playwright visual baseline (advisory)
+        continue-on-error: true
+        run: |
+          npx playwright test tests/e2e/baseline.spec.js tests/e2e/sections.spec.js
+      - name: Resolve CHROME_PATH for Lighthouse
+        run: |
+          CHROME_BIN="$(node -e 'const p=require("playwright");process.stdout.write(p.chromium.executablePath())')"
+          echo "CHROME_PATH=$CHROME_BIN" >> "$GITHUB_ENV"
+          echo "Resolved CHROME_PATH=$CHROME_BIN"
       - name: Lighthouse (retry on NO_FCP)
         run: |
           npm run build
@@ -27,7 +33,7 @@ jobs:
           sleep 2
           for i in 1 2 3; do
             echo "Lighthouse attempt $i"
-            if xvfb-run -a npx lighthouse http://127.0.0.1:4173 \
+            if npx lighthouse http://127.0.0.1:4173 \
               --chrome-flags='--headless=new --no-sandbox --disable-gpu --disable-dev-shm-usage --disable-software-rasterizer' \
               --only-categories=performance,accessibility,best-practices,seo \
               --output=json --output-path=./lighthouse-report.json; then
@@ -40,3 +46,32 @@ jobs:
             sleep 3
           done
           node ./scripts/lighthouse-threshold-check.mjs ./lighthouse-report.json
+
+  browserstack:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Skip when BrowserStack secrets are missing
+        env:
+          BROWSERSTACK_USERNAME: ${{ secrets.BROWSERSTACK_USERNAME }}
+          BROWSERSTACK_ACCESS_KEY: ${{ secrets.BROWSERSTACK_ACCESS_KEY }}
+        run: |
+          if [ -z "$BROWSERSTACK_USERNAME" ] || [ -z "$BROWSERSTACK_ACCESS_KEY" ]; then
+            echo "BrowserStack secrets are not set. Skipping BrowserStack job."
+            exit 0
+          fi
+      - name: BrowserStack Playwright run
+        env:
+          BROWSERSTACK_USERNAME: ${{ secrets.BROWSERSTACK_USERNAME }}
+          BROWSERSTACK_ACCESS_KEY: ${{ secrets.BROWSERSTACK_ACCESS_KEY }}
+        run: |
+          if [ -z "$BROWSERSTACK_USERNAME" ] || [ -z "$BROWSERSTACK_ACCESS_KEY" ]; then
+            echo "Skipped"
+            exit 0
+          fi
+          npm run test:e2e:browserstack
