@@ -42,7 +42,6 @@ jobs:
           node ./scripts/lighthouse-threshold-check.mjs ./lighthouse-report.json
 
   browserstack:
-    if: ${{ secrets.BROWSERSTACK_USERNAME != '' && secrets.BROWSERSTACK_ACCESS_KEY != '' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -51,8 +50,22 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      - name: Skip when BrowserStack secrets are missing
+        env:
+          BROWSERSTACK_USERNAME: ${{ secrets.BROWSERSTACK_USERNAME }}
+          BROWSERSTACK_ACCESS_KEY: ${{ secrets.BROWSERSTACK_ACCESS_KEY }}
+        run: |
+          if [ -z "$BROWSERSTACK_USERNAME" ] || [ -z "$BROWSERSTACK_ACCESS_KEY" ]; then
+            echo "BrowserStack secrets are not set. Skipping BrowserStack job."
+            exit 0
+          fi
       - name: BrowserStack Playwright run
         env:
           BROWSERSTACK_USERNAME: ${{ secrets.BROWSERSTACK_USERNAME }}
           BROWSERSTACK_ACCESS_KEY: ${{ secrets.BROWSERSTACK_ACCESS_KEY }}
-        run: npm run test:e2e:browserstack
+        run: |
+          if [ -z "$BROWSERSTACK_USERNAME" ] || [ -z "$BROWSERSTACK_ACCESS_KEY" ]; then
+            echo "Skipped"
+            exit 0
+          fi
+          npm run test:e2e:browserstack
