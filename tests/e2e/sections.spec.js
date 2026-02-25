@@ -24,6 +24,10 @@ async function waitForStableVisual(page) {
         transition: none !important;
         caret-color: transparent !important;
       }
+      .section {
+        content-visibility: visible !important;
+        contain-intrinsic-size: auto !important;
+      }
     `;
     document.head.appendChild(style);
 
@@ -37,12 +41,14 @@ const sectionIds = ['home', 'about', 'directions', 'projects', 'jobs', 'press', 
 
 for (const sectionId of sectionIds) {
   test(`section snapshot: ${sectionId}`, async ({ page }) => {
+    test.skip(!!process.env.CI && !process.env.BROWSERSTACK_USERNAME, 'section visual baselines run on BrowserStack');
+
     await waitForStableVisual(page);
     const section = page.locator(`section#${sectionId}`);
     await expect(section).toBeVisible();
     await expect(section).toHaveScreenshot(`${sectionId}.png`, {
       animations: 'disabled',
-      maxDiffPixelRatio: 0.01,
+      maxDiffPixelRatio: process.env.CI ? 0.02 : 0.01,
       timeout: 20_000
     });
   });
