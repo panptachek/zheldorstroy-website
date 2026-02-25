@@ -1,6 +1,6 @@
 :root {
-  --font-heading: "Eurostile Extended", "Eurostile", "Rajdhani", "Teko", "Arial Narrow", sans-serif;
-  --font-body: "Eurostile Extended", "Eurostile", "Rajdhani", "Arial", sans-serif;
+  --font-heading: "Rajdhani", "Eurostile Extended", "Eurostile", "Teko", "Arial Narrow", sans-serif;
+  --font-body: "Rajdhani", "Eurostile Extended", "Eurostile", "Arial", sans-serif;
   --radius-lg: 20px;
   --radius-md: 12px;
   --space-2: 8px;

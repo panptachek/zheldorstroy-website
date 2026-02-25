@@ -12,8 +12,9 @@ export default defineConfig({
     reducedMotion: 'reduce',
     colorScheme: 'light'
   },
+  outputDir: './artifacts/test-results',
   webServer: {
-    command: 'npm run build && npm run preview -- --host 127.0.0.1 --port 4173',
+    command: 'npx vite build --outDir .pw-dist && npx vite preview --outDir .pw-dist --host 127.0.0.1 --port 4173',
     port: 4173,
     reuseExistingServer: !process.env.CI,
     timeout: 120000
