@@ -40,3 +40,19 @@ jobs:
             sleep 3
           done
           node ./scripts/lighthouse-threshold-check.mjs ./lighthouse-report.json
+
+  browserstack:
+    if: ${{ secrets.BROWSERSTACK_USERNAME != '' && secrets.BROWSERSTACK_ACCESS_KEY != '' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: BrowserStack Playwright run
+        env:
+          BROWSERSTACK_USERNAME: ${{ secrets.BROWSERSTACK_USERNAME }}
+          BROWSERSTACK_ACCESS_KEY: ${{ secrets.BROWSERSTACK_ACCESS_KEY }}
+        run: npm run test:e2e:browserstack
