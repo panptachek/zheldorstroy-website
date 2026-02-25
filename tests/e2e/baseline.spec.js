@@ -3,13 +3,32 @@ import { test, expect } from '@playwright/test';
 async function waitForStableVisual(page) {
   await page.goto('/', { waitUntil: 'domcontentloaded' });
 
-  await page.evaluate(async () => {
-    // Fonts
-    if (document.fonts?.ready) {
-      await document.fonts.ready;
-    }
+  // Disable animations ASAP (before network settles)
+  await page.addStyleTag({
+    content: `
+      *, *::before, *::after {
+        animation: none !important;
+        transition: none !important;
+        caret-color: transparent !important;
+      }
+    `
+  });
 
-    // Images currently in DOM
+  await page.waitForLoadState('networkidle');
+
+  // Full-page warmup to stabilize lazy/content-visibility rendering
+  await page.evaluate(async () => {
+    const step = 800;
+    for (let y = 0; y < document.body.scrollHeight; y += step) {
+      window.scrollTo(0, y);
+      await new Promise((r) => setTimeout(r, 40));
+    }
+    window.scrollTo(0, 0);
+  });
+
+  await page.evaluate(async () => {
+    if (document.fonts?.ready) await document.fonts.ready;
+
     const images = Array.from(document.images || []);
     await Promise.all(
       images.map((img) => {
@@ -21,22 +40,10 @@ async function waitForStableVisual(page) {
       })
     );
 
-    // Disable transitions/animations (extra safety for CI)
-    const style = document.createElement('style');
-    style.innerHTML = `
-      *, *::before, *::after {
-        animation: none !important;
-        transition: none !important;
-        caret-color: transparent !important;
-      }
-    `;
-    document.head.appendChild(style);
-
-    // Let layout settle
     await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
   });
 
-  await page.waitForLoadState('networkidle');
+  await page.waitForTimeout(50);
 }
 
 test('homepage visual baseline', async ({ page }) => {
@@ -46,7 +53,7 @@ test('homepage visual baseline', async ({ page }) => {
     fullPage: true,
     animations: 'disabled',
     maxDiffPixelRatio: 0.02,
-    maxDiffPixels: 30000,
+    maxDiffPixels: 8000,
     timeout: 20_000
   });
 });

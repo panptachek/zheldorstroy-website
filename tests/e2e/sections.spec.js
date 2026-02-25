@@ -3,6 +3,22 @@ import { test, expect } from '@playwright/test';
 async function waitForStableVisual(page) {
   await page.goto('/', { waitUntil: 'domcontentloaded' });
 
+  await page.addStyleTag({
+    content: `
+      *, *::before, *::after {
+        animation: none !important;
+        transition: none !important;
+        caret-color: transparent !important;
+      }
+      .section {
+        content-visibility: visible !important;
+        contain-intrinsic-size: auto !important;
+      }
+    `
+  });
+
+  await page.waitForLoadState('networkidle');
+
   await page.evaluate(async () => {
     if (document.fonts?.ready) await document.fonts.ready;
 
@@ -17,24 +33,10 @@ async function waitForStableVisual(page) {
       })
     );
 
-    const style = document.createElement('style');
-    style.innerHTML = `
-      *, *::before, *::after {
-        animation: none !important;
-        transition: none !important;
-        caret-color: transparent !important;
-      }
-      .section {
-        content-visibility: visible !important;
-        contain-intrinsic-size: auto !important;
-      }
-    `;
-    document.head.appendChild(style);
-
     await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
   });
 
-  await page.waitForLoadState('networkidle');
+  await page.waitForTimeout(50);
 }
 
 const sectionIds = ['home', 'about', 'directions', 'projects', 'jobs', 'press', 'contacts'];
