@@ -23,7 +23,7 @@ jobs:
           npx playwright test tests/e2e/baseline.spec.js tests/e2e/sections.spec.js
       - name: Resolve CHROME_PATH for Lighthouse
         run: |
-          CHROME_BIN="$(node -e \"const { chromium } = require('playwright'); process.stdout.write(chromium.executablePath())\")"
+          CHROME_BIN="$(node -e 'const p=require("playwright");process.stdout.write(p.chromium.executablePath())')"
           echo "CHROME_PATH=$CHROME_BIN" >> "$GITHUB_ENV"
           echo "Resolved CHROME_PATH=$CHROME_BIN"
       - name: Lighthouse (retry on NO_FCP)
