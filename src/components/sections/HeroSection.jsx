@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Button } from '../ui/Button';
 import { heroTitle, heroSubtitle, metrics } from '../../content/siteContent';
 
-const heroVariants = ['/assets/hero-v3-1.png', '/assets/hero-v3-2.png', '/assets/hero-v3-3.png'];
+const heroVariants = ['/assets/hero-v3-1.webp', '/assets/hero-v3-2.webp', '/assets/hero-v3-3.webp'];
 
 export function HeroSection() {
   const [active, setActive] = useState(0);
@@ -21,7 +21,15 @@ export function HeroSection() {
         </div>
         <div>
           <div className="hero__media" role="img" aria-label="Высокоскоростной поезд в фирменных цветах">
-            <img src={heroVariants[active]} alt="Высокоскоростной поезд ООО ЖЕЛДОРСТРОЙ" loading="eager" />
+            <img
+              src={heroVariants[active]}
+              alt="Высокоскоростной поезд ООО ЖЕЛДОРСТРОЙ"
+              loading="eager"
+              fetchPriority="high"
+              width="1365"
+              height="768"
+              decoding="async"
+            />
           </div>
           <div className="hero__switch">
             {heroVariants.map((_, idx) => (
