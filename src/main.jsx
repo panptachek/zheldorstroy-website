@@ -1,6 +1,8 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App';
+import '@fontsource/rajdhani/500.css';
+import '@fontsource/rajdhani/600.css';
 import '../styles/tokens.css';
 import '../styles/global.css';
 
