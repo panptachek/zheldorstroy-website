@@ -25,6 +25,8 @@ jobs:
         run: |
           echo "CHROME_PATH=$(which google-chrome)" >> "$GITHUB_ENV"
           echo "Resolved CHROME_PATH=$(which google-chrome)"
+      - name: Build (blocking)
+        run: npm run build
       - name: Playwright smoke (blocking)
         run: npx playwright test tests/e2e/smoke.spec.js
       - name: Lighthouse (retry on NO_FCP)
@@ -48,7 +50,7 @@ jobs:
           done
           node ./scripts/lighthouse-threshold-check.mjs ./lighthouse-report.json
 
-  visual_advisory:
+  visual:
     runs-on: ubuntu-22.04
     container:
       image: mcr.microsoft.com/playwright:v1.58.2-jammy
