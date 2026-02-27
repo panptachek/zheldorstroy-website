@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import { Button } from '../ui/Button';
 import { heroTitle, heroSubtitle, metrics } from '../../content/siteContent';
+import { isTestMode } from '../../utils/testMode';
 
 const heroVariants = ['/assets/hero-v3-1.webp', '/assets/hero-v3-2.webp', '/assets/hero-v3-3.webp'];
 
 export function HeroSection() {
+  const testMode = isTestMode();
   const [active, setActive] = useState(0);
 
   return (
@@ -33,7 +35,15 @@ export function HeroSection() {
           </div>
           <div className="hero__switch">
             {heroVariants.map((_, idx) => (
-              <button key={idx} type="button" className={`hero-dot ${active === idx ? 'is-active' : ''}`} onClick={() => setActive(idx)} aria-label={`Показать hero-вариант ${idx + 1}`}>
+              <button
+                key={idx}
+                type="button"
+                className={`hero-dot ${active === idx ? 'is-active' : ''}`}
+                onClick={() => {
+                  if (!testMode) setActive(idx);
+                }}
+                aria-label={`Показать hero-вариант ${idx + 1}`}
+              >
                 {idx + 1}
               </button>
             ))}

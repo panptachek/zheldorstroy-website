@@ -1,5 +1,5 @@
 export async function prepareStableVisual(page, { fullPage = false } = {}) {
-  await page.goto('/', { waitUntil: 'domcontentloaded' });
+  await page.goto('/?test-mode=1', { waitUntil: 'domcontentloaded' });
 
   await page.addStyleTag({
     content: `

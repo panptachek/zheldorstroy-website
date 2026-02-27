@@ -13,12 +13,15 @@
 }
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
+html[data-test-mode='1'] { scroll-behavior: auto; }
 body { margin: 0; font-family: var(--font-body); background: var(--neutral-black-900); color: var(--neutral-white); line-height: 1.45; }
 a { color: inherit; text-decoration: none; }
 h1,h2,h3,h4 { font-family: var(--font-heading); margin: 0; letter-spacing: 0.02em; text-transform: uppercase; }
 .container { width: min(100% - 32px, var(--container)); margin-inline: auto; }
 .section { padding: 72px 0; border-top: 1px solid rgba(247,248,250,.1); }
 .section:not(.hero) { content-visibility: auto; contain-intrinsic-size: 900px; }
+html[data-test-mode='1'] .section { content-visibility: visible !important; contain-intrinsic-size: auto !important; }
+html[data-test-mode='1'] *, html[data-test-mode='1'] *::before, html[data-test-mode='1'] *::after { animation: none !important; transition: none !important; }
 .muted { color: #b9bcc6; }
 .grid-4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; }
 .grid-2 { display:grid; grid-template-columns: 1fr 1fr; gap:16px; }
