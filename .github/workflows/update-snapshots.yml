@@ -1,4 +1,4 @@
-name: Update Playwright Snapshots (Linux)
+name: Update Visual Snapshots (CI canonical)
 
 on:
   workflow_dispatch:
@@ -6,13 +6,21 @@ on:
 jobs:
   update-snapshots:
     runs-on: ubuntu-22.04
-    container:
-      image: mcr.microsoft.com/playwright:v1.58.2-jammy
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
       - run: npm ci
-      - name: Update Linux snapshots
-        run: npm run test:e2e:update
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Update visual snapshots (canonical)
+        env:
+          CI: "1"
+        run: |
+          npm run test:e2e:update
+          npm run test:e2e:visual:fullpage -- --update-snapshots
       - name: Upload updated snapshots artifact
         uses: actions/upload-artifact@v4
         with:
@@ -20,3 +28,4 @@ jobs:
           path: |
             tests/e2e/baseline.spec.js-snapshots
             tests/e2e/sections.spec.js-snapshots
+            tests/e2e/fullpage.spec.js-snapshots
