@@ -56,8 +56,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: npm ci
-      - name: Playwright visual baseline (advisory)
+      - name: Playwright visual contract (advisory)
         run: npm run test:e2e:visual
+      - name: Playwright full-page visual (advisory)
+        if: always()
+        continue-on-error: true
+        run: npm run test:e2e:visual:fullpage
       - name: Upload Playwright report
         if: always()
         uses: actions/upload-artifact@v4

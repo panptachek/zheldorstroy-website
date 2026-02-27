@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { prepareStableVisual } from './helpers/visual';
 
-const sectionIds = ['home', 'about', 'directions', 'projects', 'jobs', 'press', 'contacts'];
+const sectionIds = ['home', 'about', 'directions', 'projects', 'contacts'];
 
 for (const sectionId of sectionIds) {
   test(`section snapshot: ${sectionId}`, async ({ page }) => {

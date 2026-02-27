@@ -9,6 +9,7 @@
     "preview": "vite preview",
     "test:e2e": "playwright test",
     "test:e2e:visual": "playwright test tests/e2e/baseline.spec.js tests/e2e/sections.spec.js",
+    "test:e2e:visual:fullpage": "playwright test tests/e2e/fullpage.spec.js",
     "test:e2e:update": "playwright test tests/e2e/baseline.spec.js tests/e2e/sections.spec.js --update-snapshots",
     "test:e2e:browserstack": "browserstack-node-sdk playwright test",
     "lhci": "lhci autorun"
